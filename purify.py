@@ -16,11 +16,12 @@ import argparse
 import cv2
 from networks import *
 from utils import *
+from model_defs import model_mlp_any as MLP
 
 if __name__ == '__main__': 
     parser = argparse.ArgumentParser(description='Purify Images')
     parser.add_argument('--dir', default= 'adv_images/')
-    parser.add_argument('--purifier', type=str, default= 'NRP',  help ='NPR, NRP_resG')
+    parser.add_argument('--purifier', type=str, default= 'NRP',  help ='NPR, NRP_resG, MLP')
     parser.add_argument('--dynamic', action='store_true', help='Dynamic inferrence (in case of whitebox attack)')
     args = parser.parse_args()
     print(args)
@@ -33,6 +34,9 @@ if __name__ == '__main__':
     if args.purifier == 'NRP_resG':
         netG = NRP_resG(3, 3, 64, 23)
         netG.load_state_dict(torch.load('pretrained_purifiers/NRP_resG.pth'))
+    if args.purifier == 'MLP':
+        netG = MLP(in_dim=784, neurons=[255])
+        netG.load_state_dict(torch.load('pretrained_purifiers/mlp55.pth'))
     netG = netG.to(device)
     netG.eval()
 
